@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="..\build\HỆ THỐNG QUẢN LÍ BÁN HÀNG.props" />
+</Project>

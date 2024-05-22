@@ -1,0 +1,173 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - HỆ THỐNG QUẢN LÍ BÁN HÀNG</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/HỆ_THỐNG_QUẢN_LÍ_BÁN_HÀNG.styles.css" asp-append-version="true" />
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            background-size: cover; /*kích thước nền*/
+            /*background-position-y: -100px; /*vị trí nền*/
+            min-height: 100vh;
+            margin: 0;
+            font-family: "Montserrat", sans-serif;
+        }
+
+        header {
+            position: fixed; /*định vị header cố định*/
+            top: 0;
+            width: 100%;
+            z-index: 1050; 
+            /*background-color: darkblue;*/
+            color: white;
+        }
+
+        .navbar {
+            background-color: darkblue;
+            height:60px;
+        }
+
+        .navbar-brand, .nav-link {
+            color: white !important;
+        }
+
+        .main-content {
+            margin-top: 80px; /* Space for the fixed header */
+            margin-left: 220px; /* Space for the fixed sidebar */
+            padding: 20px;
+            flex: 1; /*take up remaining space*/
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 60px; /* Adjust to the height of the header */
+            left: 0;
+            width: 200px;
+            height: calc(100% - 60px); /* Full height minus the header */
+            background-color: darkblue;
+            padding-top: 20px;
+            z-index: 1000;
+            border-radius: 20px 0px 5em / 0px 25px 20%;
+        }
+
+            .sidebar a {
+                display: block;
+                color: white;
+                padding: 10px 15px;
+                text-decoration: none;
+            }
+
+                .sidebar a:hover {
+                    background-color: #5f27cd;
+                }
+
+            .sidebar .sub-menu {
+                display: none;
+                background-color: #182C61;
+                padding-left: 15px;
+            }
+
+            .sidebar .nav-item:hover .sub-menu {
+                display: block;
+            }
+
+            .sidebar .nav-item {
+                position: relative;
+            }
+
+               
+        footer {
+            background-color: #f8f9fa;
+            padding: 2px 0;
+            text-align: center;
+            width: 100%;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+        }
+    </style>
+</head>
+<body s> 
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-light border-bottom box-shadow mb-3">
+            <div class="container">
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">HỆ THỐNG QUẢN LÍ BÁN HÀNG</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse">
+                    <partial name="_LoginPartial.cshtml" />
+                    <ul class="navbar-nav flex-grow-1">
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">Trang chủ</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="sidebar">
+        @if (User.Identity.IsAuthenticated)
+        {
+            <nav>
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link" asp-area="" asp-controller="Home" asp-action="TblKhachhang">Khách hàng</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-area="" asp-controller="Home" asp-action="TblNhacungcap">Nhà cung cấp</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-area="" asp-controller="Home" asp-action="TblNhanvien">Nhân viên</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-area="" asp-controller="Home" asp-action="TblDonviVc">Đơn vị vận chuyển</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-area="" asp-controller="Home" asp-action="TblSanpham">Sản phẩm</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-area="" asp-controller="Home" asp-action="TblDonhang">Đơn hàng</a>
+                        <ul class="sub-menu">
+                            <li class="nav-item">
+                                <a class="nav-link" asp-area="" asp-controller="Home" asp-action="TblCtdonhang">Đơn hàng chi tiết</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-area="" asp-controller="Home" asp-action="TblPhieunhap">Phiếu nhập</a>
+                        <ul class="sub-menu">
+                            <li class="nav-item">
+                                <a class="nav-link" asp-area="" asp-controller="Home" asp-action="TblPhieunhapCt">Phiếu nhập chi tiết</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </nav>
+        }
+    </div>
+
+    <div class="container" >
+        <main role="main" class="main-content">
+            @RenderBody()
+        </main>
+    </div>
+</body>
+<footer class="border-top footer text-muted">
+    <div class="container">
+        &copy; 2024 - XuanMyLinh - <a asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+    </div>
+</footer>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</html>

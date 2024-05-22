@@ -1,0 +1,427 @@
+﻿@{
+    ViewData["Title"] = "DANH SÁCH  CHI TIẾT ĐƠN HÀNG";
+}
+
+<h1 style="color:rgb(42, 44, 44);">@ViewData["Title"]</h1>
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="//cdn.datatables.net/2.0.5/js/dataTables.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/shim.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<link rel="stylesheet" href="//cdn.datatables.net/2.0.5/css/dataTables.dataTables.min.css" />
+
+<style>
+
+    .button-container {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .btnEdit, .btnDelete {
+        color: #fff;
+        border: none;
+        padding: 5px 10px;
+        cursor: pointer;
+        margin-right: 5px;
+        border-radius: 5px;
+        transition: opacity 0.3s ease;
+    }
+
+    .btnEdit {
+        background-color: #007bff;
+    }
+
+    .btnDelete {
+        background-color: #dc3545;
+    }
+
+    .btnEdit:hover, .btnDelete:hover {
+        opacity: 0.7;
+    }
+
+    #editForm h2 {
+        text-align: center;
+        margin: 20px 0;
+    }
+
+    .btnSave, .btnCancel, .btnCreate {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+        cursor: pointer;
+        margin: 10px;
+    }
+
+    .btnSave, .btnCreate {
+        background-color: #0b63e6;
+        color: white;
+    }
+
+    .btnCancel {
+        background-color: #f44336;
+        color: white;
+    }
+
+    .btnSave:hover, .btnCancel:hover, .btnCreate:hover {
+        opacity: 0.8;
+    }
+
+    input {
+        width: 100%;
+        margin-bottom: 20px;
+    }
+
+    .button-containers {
+        display: flex;
+    }
+
+    #editFormContainer {
+        background-color: rgba(0, 0, 0, 0.5); 
+    }
+
+    #editForm {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: max-content;
+        padding: 20px;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        z-index: 1001;
+        background-color: aquamarine;
+    }
+
+    #addFormContainer {
+        display: none;
+        z-index: 10000; /* Đặt z-index lớn hơn để hiển thị trên các phần khác của trang */
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        width: max-content;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        background-color: #cccdcf;
+        position: fixed; /* Đặt vị trí cố định trên trang */
+    }
+
+    #editFormContainer {
+        display: none;
+        z-index: 10000; /* Đặt z-index lớn hơn để hiển thị trên các phần khác của trang */
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        width: max-content;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        background-color: #cccdcf;
+        position: fixed; /* Đặt vị trí cố định trên trang */
+    }
+
+    #addFormContainer {
+        background-color: rgba(0, 0, 0, 0.5); /* Đặt màu nền mờ */
+    }
+
+    #addForm {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: max-content;
+        padding: 20px;
+        border: px solid #ccc;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        z-index: 1001;
+        background-color: aquamarine;
+    }
+
+
+    #btnAdd {
+        background-color: #0b63e6;
+        padding: 10px;
+        font-weight: 600;
+        border-radius: 5px;
+        color: #f7f9fc
+    }
+
+    .button-container button:hover {
+        background-color: #008CBA !important; /* Change background color on hover */
+        cursor: pointer !important; /* Change cursor to a pointer on hover */
+    }
+</style>
+
+
+<div class="button-container">
+    <button type="submit" id="btnAdd" style="background-color: #4CAF50; color: white; padding: 10px 20px; border: none; border-radius: 5px;">Thêm Đơn Hàng Chi Tiết</button>
+    <button id="exportButton" style="background-color: orangered; color: white; padding: 10px 20px; border: none; border-radius: 5px;">Xuất File Excel</button>
+</div>
+
+
+<div id="addFormContainer" style="display: none;">
+    <form id="addForm">
+        <div><input type="hidden" id="ctId" name="ctId" /></div>
+        <div><input type="text" id="ctDhId" name="ctDhId" placeholder="ID đơn hàng" required></div>
+        <div><input type="text" id="ctSpId" name="ctSpId" placeholder="Id sản phẩm" required></div>
+        <div><input type="text" id="ctMa" name="ctMa" placeholder="Mã   " required></div>
+        <div><input type="number" id="ctGiaSp" name="ctGiaSp" placeholder="Giá SP" required></div>
+        <div><input type="number" id="ctSoluong" name="ctSoluong" placeholder="Số lượng" required></div>
+        <div class="button-containers">
+            <button type="submit" class="btnCancel">Hủy</button>
+            <button type="submit" class="btnCreate">Thêm</button>
+        </div>
+    </form>
+</div>
+
+
+<table id="tbl1">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>ID đơn hàng</th>
+            <th>ID sản phẩm </th>
+            <th>Mã </th>
+            <th>Giá sản phẩm</th>
+            <th>Số lượng</th>
+        </tr>
+    </thead>
+</table>
+
+<div id="editFormContainer" style="display:none" ;>
+    <form id="editForm">
+        <h2> Edit Form</h2>
+        <input type="hidden" id="ctId" name="ctDId" />
+        <div>
+            <label for="ctDhId"> ID đơn hàng :</label>
+            <input type="text" id="ctDhId" name="ctDhId" placeholder="ID đơn hàng " required />
+        </div>
+        <div>
+            <label for="ctSpId"> ID sản phẩm :</label>
+            <input type="text" id="ctSpId" name="ctSpId" placeholder="ID sản phẩm " required />
+        </div>
+        <div>
+            <label for="ctMa"> Mã:</label>
+            <input type="text" id="ctMa" name="ctMa" placeholder="mã Phiếu nhập chi tiết" required />
+        </div>
+        <div>
+            <label for="ctGiaSp"> Giá:</label>
+            <input type="number" id="ctGiaSp" name="ctGiaSp" placeholder="Giá" required />
+        </div>
+        <div>
+            <label for="ctSoluong"> Số lượng :</label>
+            <input type="number" id="ctSoluong" name="ctSoluong" placeholder="Số lượng " regquired />
+        </div>
+        <div class="button-containers">
+            <button type="submit" class="btnSave">Lưu</button>
+            <button type="submit" class="btnCancel">Hủy</button>
+        </div>
+    </form>
+</div>
+
+
+<script>
+    //get information
+    $(document).ready(function () {
+        var url = "https://localhost:7282/TblCtdonhang/Get";
+
+        //khởi tạo DataTable
+        $.get(url, {}, function (kq) {
+            var dulieu = kq.data;
+            table_direct = new DataTable('#tbl1',
+                {
+                    data: dulieu,
+                    columns: [
+                        { "data": "ctId" },
+                        { "data": "ctDhId" },
+                        { "data": "ctSpId" },
+                        { "data": "ctMa" },
+                        { "data": "ctGiaSp" },
+                        { "data": "ctSoluong" },
+                        {
+                            "data": null,
+                            "defaultContent": "<div class='button-container'><button class='btnEdit'>Sửa</button><button class='btnDelete'>Xóa</button></div>"
+                        }
+                    ]
+                }
+            );
+
+
+            // Create Method =============================================
+            $('#btnAdd').on('click', function () {
+                // Clear the form fields
+                $('#addForm input[type="text"]').val('');
+
+
+                // Show the form
+                $('#addFormContainer').show();
+            });
+
+            // Handle form submission
+            $('#addForm').on('submit', function (e) {
+                e.preventDefault();
+
+                // Get the created data from the form
+                var createData = {
+                    ctId: $('#addForm #ctId').val(),
+                    ctDhId: $('#addForm #ctDhId').val(),
+                    ctSpId: $('#addForm #ctSpId').val(),
+                    ctMa: $('#addForm #ctMa').val(),
+                    ctGiaSp: $('#addForm #ctGiaSp').val(),
+                    ctSoluong: $('#addForm #ctSoluong').val(),
+
+                };
+
+                console.log("Mảng nhận được là:", createData);
+
+                // Send a request to the server to create the data
+                var url = "https://localhost:7282/TblCtdonhang/Insert";
+                $.post(url + "?ma=" + $("#ctMa").val() + "&dhId=" + $("#ctDhId").val() + "&spId=" + $("#ctSpId").val() 
+                + "&giaSp=" + $("#ctGiaSp").val() + "&soluong=" + $("#ctSoluong").val(), { 
+                }, function (response) {
+                    console.log("Thêm mới thành công:", response);
+                    location.reload();
+                }).fail(function (xhr, status, error) {
+                    console.error("Có lỗi xảy ra: ", error);
+                });
+            });
+
+            // "Cancel" button
+            $('#addForm .btnCancel').on('click', function (e) {
+                e.preventDefault();
+
+                // Hide the form
+                $('#addForm').hide();
+            });
+
+            // "Cancel" button for edit form
+            $('#editForm .btnCancel').on('click', function (e) {
+                e.preventDefault();
+
+                // Hide the form
+                $('#editFormContainer').hide();
+            });
+
+
+            // EDIT METHOD ===================================================
+            $('#tbl1 tbody').on('click', '.btnEdit', function () {
+                var data = table_direct.row($(this).parents('tr')).data();
+
+                // Điền dữ liệu vào form chỉnh sửa
+                $('#editForm #ctId').val(data.ctId);
+                $('#editForm #ctDhId').val(data.ctDhId);
+                $('#editForm #ctSpId').val(data.ctSpId);
+                $('#editForm #ctMa').val(data.ctMa);
+                $('#editForm #ctGiaSp').val(data.ctGiaSp);
+                $('#editForm #ctSoluong').val(data.ctSoluong);
+
+                // Hiển thị form
+                $('#editFormContainer').show();
+            });
+
+            // Xử lý khi submit form chỉnh sửa
+            $('#editForm').on('submit', function (e) {
+                e.preventDefault();
+
+                // Lấy dữ liệu đã cập nhật từ form
+                var updatedData = {
+                    ctId: $('#editForm #ctId').val(),
+                    ctDhId: $('#editForm #ctDhId').val(),
+                    ctSpId: $('#editForm #ctSpId').val(),
+                    ctMa: $('#editForm #ctMa').val(),
+                    ctGiaSp: $('#editForm #ctGiaSp').val(),
+                    ctSoluong: $('#editForm #ctSoluong').val(),
+
+                };
+
+                console.log("Chuỗi lấy được là:", updatedData);
+
+                var url = "https://localhost:7282/TblCtdonhang/Update";
+                $.post(url + "?ctdhId=" + $("#editForm #ctId").val() + "&ma=" + $("#editForm #ctMa").val() + "&dhId=" + $("#editForm #ctDhId").val() 
+                + "&spId=" + $("#editForm #ctSpId").val() + "&giaSp=" + $("#editForm #ctGiaSp").val() + "&soluong=" + $("#editForm #ctSoluong").val(), {
+                }, function (response) {
+                    console.log("Cập nhật thành công:", response);
+                    location.reload();
+                }).fail(function (xhr, status, error) {
+                    console.error("Có lỗi xảy ra khi cập nhật :", error);
+                });
+            });
+
+            // Nút "Hủy"
+            $('#editForm .btnCancel').on('click', function (e) {
+                e.preventDefault();
+
+                // Ẩn form
+                $('#editFormContainer').hide();
+            });
+
+
+            // DELETE METHOD =======================================================
+            $('#tbl1 tbody').on('click', '.btnDelete', function () {
+                var data = table_direct.row($(this).parents('tr')).data();
+
+                var ctId = data.ctId; // Get the product ID
+                var ctDhId = data.ctDhId;// Get the product ID
+                var ctSpId = data.ctSpId; // Get the product ID
+
+
+                // Send a DELETE request to the server endpoint
+                if (confirm("Bạn có muốn xóa Phiếu nhập CT này không?")) {
+                    $.ajax({
+                        url: 'https://localhost:7282/TblCtdonhang/Delete?ctdhId=' + ctId + '&dhId=' + ctDhId + '&spId=' + ctSpId,
+                        type: 'DELETE',
+                        success: function () {
+                            table_direct.ajax.reload();
+                        },
+                        error: function (jqXHR, textStatus, errorThrown) {
+                            console.error('Lỗi xóa: ', textStatus, errorThrown);
+                        }
+                    });
+                }
+            });
+
+
+            //EXPORT FILE
+            $('#exportButton').on('click', function () {
+                // Lấy dữ liệu từ bảng DataTable
+                var data = table_direct.rows().data().toArray();
+
+                // Tạo một đối tượng Workbook mới từ dữ liệu bảng
+                var wb = XLSX.utils.book_new();
+                var ws = XLSX.utils.json_to_sheet(data);
+                XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+
+                // Tạo một ArrayBuffer từ Workbook
+                var wbout = XLSX.write(wb, { type: 'array' });
+
+                // Chuyển đổi ArrayBuffer thành Blob
+                var wbBlob = new Blob([wbout], { type: 'application/octet-stream' });
+
+                // Tạo một URL từ Blob
+                var url = window.URL.createObjectURL(wbBlob);
+
+                // Tạo một thẻ <a> để tải xuống tệp Excel
+                var a = document.createElement('a');
+                a.href = url;
+                a.download = 'data.xlsx';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            });
+        });
+    });
+</script>

@@ -1,0 +1,682 @@
+﻿@{
+}
+@{
+    ViewData["Title"] = "DANH SÁCH PHIẾU NHẬP CHI TIẾT";
+    var pnId = ViewBag.pnId;
+}
+
+<h1 style="color:rgb(42, 44, 44);">@ViewData["Title"]</h1>
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="//cdn.datatables.net/2.0.5/js/dataTables.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/shim.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<link rel="stylesheet" href="//cdn.datatables.net/2.0.5/css/dataTables.dataTables.min.css" />
+
+<style>
+
+    .button-container {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .btnEdit, .btnDelete {
+        color: #fff;
+        border: none;
+        padding: 5px 10px;
+        cursor: pointer;
+        margin-right: 5px;
+        border-radius: 5px;
+        transition: opacity 0.3s ease;
+    }
+
+    .btnEdit {
+        background-color: #007bff;
+    }
+
+    .btnDelete {
+        background-color: #dc3545;
+    }
+
+    .btnEdit:hover, .btnDelete:hover {
+        opacity: 0.7;
+    }
+
+    #editForm h2 {
+        text-align: center;
+        margin: 20px 0;
+    }
+
+    .btnSave, .btnCancel, .btnCreate {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+        cursor: pointer;
+        margin: 10px;
+    }
+
+    .btnSave, .btnCreate {
+        background-color: #0b63e6;
+        color: white;
+    }
+
+    .btnCancel {
+        background-color: #f44336;
+        color: white;
+    }
+
+    .btnSave:hover, .btnCancel:hover, .btnCreate:hover {
+        opacity: 0.8;
+    }
+
+    input {
+        width: 100%;
+        margin-bottom: 20px;
+    }
+
+    .button-containers {
+        display: flex;
+    }
+
+    #editFormContainer {
+        background-color: rgba(0, 0, 0, 0.5); /* Đặt màu nền mờ */
+    }
+
+    #editForm {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: max-content;
+        padding: 20px;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        z-index: 1001;
+        background-color: aquamarine;
+    }
+
+    #addFormContainer {
+        display: none;
+        z-index: 10000; /* Đặt z-index lớn hơn để hiển thị trên các phần khác của trang */
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        width: max-content;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        background-color: #cccdcf;
+        position: fixed; /* Đặt vị trí cố định trên trang */
+    }
+
+    #editFormContainer {
+        display: none;
+        z-index: 10000; /* Đặt z-index lớn hơn để hiển thị trên các phần khác của trang */
+        left: 50%;
+        top: 44%;
+        transform: translate(-50%, -50%);
+        width: max-content;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        background-color: #cccdcf;
+        position: fixed; /* Đặt vị trí cố định trên trang */
+    }
+
+    #addFormContainer {
+        background-color: rgba(0, 0, 0, 0.5); /* Đặt màu nền mờ */
+    }
+
+    #addForm {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: max-content;
+        padding: 20px;
+        border: px solid #ccc;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        z-index: 1001;
+        background-color: aquamarine;
+    }
+    
+    #btnAdd {
+        background-color: #0b63e6;
+        padding: 10px;
+        font-weight: 600;
+        border-radius: 5px;
+        color: #f7f9fc
+    }
+
+    .button-container button:hover {
+        background-color: #008CBA !important; /* Change background color on hover */
+        cursor: pointer !important; /* Change cursor to a pointer on hover */
+    }
+</style>
+
+
+<div class="button-container">
+    <button type="submit" id="btnAdd" style="background-color: #4CAF50; color: white; padding: 10px 20px; border: none; border-radius: 5px;">Thêm phiếu nhập chi tiết</button>
+    <button id="exportButton" style="background-color: orangered; color: white; padding: 10px 20px; border: none; border-radius: 5px;">Xuất File Excel</button>
+
+</div>
+
+<div id="addFormContainer" style="display: none;">
+    <form id="addForm">
+        <div><input type="hidden" id="ctnId" name="ctnId" /></div>
+        <div><input type="text" id="ctnMa" name="ctnMa" placeholder="Mã Phiếu nhập chi tiết" required></div>
+        <div><input type="number" id="ctnGianhap" name="ctnGianhap" placeholder="Giá nhập" step="0.01" required></div>
+        <div><input type="number" id="ctnSoluong" name="ctnSoluong" placeholder="Số lượng" min="1" required></div>
+        <div><input type="hidden" id="ctnTongtien" name="ctnTongtien" placeholder="Tổng tiền" step="0.01"></div>
+        <div><input type="text" id="ctnSpId" name="ctnSpId" placeholder="Id sản phẩm" required></div>
+        <div><input type="text" id="ctnNccId" name="ctnNccId" placeholder="Id nhà cung cấp" required></div>
+        <div><input type="text" id="ctnPnId" name="ctnPnId" placeholder="Phiếu nhập id" required></div>
+        <div class="button-containers">
+            <button type="submit" class="btnCancel">Hủy</button>
+            <button type="submit" class="btnCreate">Thêm</button>
+        </div>
+    </form>
+</div>
+
+<table id="tbl1">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Mã</th>
+            <th>Giá nhập </th>
+            <th>Số lượng </th>
+            <th>Tổng tiền </th>
+            <th>Id sản phẩm</th>
+            <th>Id nhà cung cấp</th>
+            <th>Id phiếu nhập</th>
+        </tr>
+    </thead>
+</table>
+
+<div id="editFormContainer" style="display:none" ;>
+    <form id="editForm">
+        <h2> Edit Form</h2>
+        <input type="hidden" id="ctnId" name="ctnId" />
+        <div>
+            <label for="ctnMa"> Mã:</label>
+            <input type="text" id="ctnMa" name="ctnMa" placeholder="mã Phiếu nhập chi tiết" required />
+        </div>
+        <div>
+            <label for="ctnGianhap"> Giá nhập :</label>
+            <input type="number" id="ctnGianhap" name="ctnGianhap" placeholder="Giá nhập " step="0.01" required />
+        </div>
+        <div>
+            <label for="ctnSoluong"> Số lượng:</label>
+            <input type="number" id="ctnSoluong" name="ctnSoluong" placeholder="Số lượng" min="1" required />
+        </div>
+        <div>
+            <input type="hidden" id="ctnTongtien" name="ctnTongtien" placeholder="Tổng tiền" step="0.01" required />
+        </div>
+        <div>
+            <label for="ctnSpId"> Id sản phẩm :</label>
+            <input type="text" id="ctnSpId" name="ctnSpId" placeholder="Id sản phẩm" required />
+        </div>
+        <div>
+            <label for="ctnNccId"> Id nhà cung cấp :</label>
+            <input type="text" id="ctnNccId" name="ctnNccId" placeholder="Id nhà cung cấp" required />
+        </div>
+        <div>
+            <label for="ctnPnId"> Id phiếu nhập:</label>
+            <input type="text" id="ctnPnId" name="ctnPnId" placeholder="Id phiếu nhập" required />
+        </div>
+
+        <div class="button-containers">
+            <button type="submit" class="btnSave">Lưu</button>
+            <button type="submit" class="btnCancel">Hủy</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    //get information
+    $(document).ready(function () {
+        var pnId = '@pnId'; // Lấy giá trị pnId từ server-side hoặc từ nguồn khác
+        if (pnId) {
+            // Nếu có pnId thì lấy chi tiết sử dụng pnId
+            var urlDetail = "https://localhost:7282/TblPhieunhapCt/GetById?pnId=" + pnId;
+            $.get(urlDetail, function (response) {
+                // Xử lý và hiển thị dữ liệu chi tiết
+                var data = response.data;
+                table_direct = new DataTable('#tbl1', {
+                    data: data,
+                    columns: [
+                        { "data": "ctnId" },
+                        { "data": "ctnMa" },
+                        { "data": "ctnGianhap" },
+                        { "data": "ctnSoluong" },
+                        { "data": "ctnTongtien" },
+                        { "data": "ctnSpId" },
+                        { "data": "ctnNccId" },
+                        { "data": "ctnPnId" },
+                        {
+                            "data": null,
+                            "defaultContent": "<div class='button-container'><button class='btnEdit'>Sửa</button><button class='btnDelete'>Xóa</button></div>"
+                        }
+                    ]
+                });
+
+
+                // CREATE METHOD =============================================
+                $('#btnAdd').on('click', function () {
+                    // Clear the form fields
+                    $('#addForm input[type="text"]').val('');
+
+
+                    // Show the form
+                    $('#addFormContainer').show();
+                });
+
+                // Handle form submission
+                $('#addForm').on('submit', function (e) {
+                    e.preventDefault();
+
+                    // Get the created data from the form
+                    var createData = {
+                        ctnId: $('#addForm #ctnId').val(),
+                        ctnMa: $('#addForm #ctnMa').val(),
+                        ctnGianhap: $('#addForm #ctnGianhap').val(),
+                        ctnSoluong: $('#addForm #ctnSoluong').val(),
+                        ctnSpId: $('#addForm #ctnSpId').val(),
+                        ctnNccId: $('#addForm #ctnNccId').val(),
+                        ctnPnId: $('#addForm #ctnPnId').val(),
+
+                    };
+
+                    console.log("Mảng nhận được là:", createData);
+
+                    // Send a request to the server to create the data
+                    var url = "https://localhost:7282/TblPhieunhapCt/Insert";
+                    $.post(url + "?ma=" + $("#ctnMa").val() + "&gianhap=" + $("#ctnGianhap").val() + "&soluong=" 
+                    + $("#ctnSoluong").val() + "&tongtien=" + $("#ctnTongtien").val() + "&spId=" + $("#ctnSpId").val() 
+                    + "&nccId=" + $("#ctnNccId").val() + "&pnId=" + $("#ctnPnId").val(), { 
+                    }, function (response) {
+                        console.log("Thêm mới thành công:", response);
+                        location.reload();
+                    }).fail(function (xhr, status, error) {
+                        console.error("Có lỗi xảy ra: ", error);
+                    });
+                });
+
+                // "Cancel" button
+                $('#addForm .btnCancel').on('click', function (e) {
+                    e.preventDefault();
+
+                    // Hide the form
+                    $('#addForm').hide();
+                });
+
+                // "Cancel" button for edit form
+                $('#editForm .btnCancel').on('click', function (e) {
+                    e.preventDefault();
+
+                    // Hide the form
+                    $('#editFormContainer').hide();
+                });
+
+
+                // EDIT METHOD ===================================================
+                $('#tbl1 tbody').on('click', '.btnEdit', function () {
+                    var data = table_direct.row($(this).parents('tr')).data();
+
+                    // Điền dữ liệu vào form chỉnh sửa
+                    $('#editForm #ctnId').val(data.ctnId);
+                    $('#editForm #ctnMa').val(data.ctnMa);
+                    $('#editForm #ctnGianhap').val(data.ctnGianhap);
+                    $('#editForm #ctnSoluong').val(data.ctnSoluong);
+                    $('#editForm #ctnTongtien').val(data.ctnTongtien);
+                    $('#editForm #ctnSpId').val(data.ctnSpId);
+                    $('#editForm #ctnNccId').val(data.ctnNccId);
+                    $('#editForm #ctnPnId').val(data.ctnPnId);
+
+                    // Hiển thị form
+                    $('#editFormContainer').show();
+                });
+
+                // Xử lý khi submit form chỉnh sửa
+                $('#editForm').on('submit', function (e) {
+                    e.preventDefault();
+
+                    // Lấy dữ liệu đã cập nhật từ form
+                    var updatedData = {
+                        ctnId: $('#editForm #ctnId').val
+                            (),
+                        ctnMa: $('#editForm #ctnMa').val(),
+                        ctnGianhap: $('#editForm #ctnGianhap').val(),
+                        ctnSoluong: $('#editForm #ctnSoluong').val(),
+                        ctnTongtien: $('#editForm #ctnTongtien').val(),
+                        ctnSpId: $('#editForm #ctnSpId').val(),
+                        ctnNccId: $('#editForm #ctnNccId').val(),
+                        ctnPnId: $('#editForm #ctnPnId').val(),
+
+                    };
+
+                    console.log("Chuỗi lấy được là:", updatedData);
+
+                    var url = "https://localhost:7282/TblPhieunhapCt/Update";
+
+                    $.post(url + "?pnctId=" + $("#editForm #ctnId").val() + "&ma=" + $("#editForm #ctnMa").val() 
+                    + "&gianhap=" + $("#editForm #ctnGianhap").val() + "&soluong=" + $("#editForm #ctnSoluong").val() 
+                    + "&tongtien=" + $("#editForm #ctnTongtien").val() + "&spId=" + $("#editForm #ctnSpId").val() + "&nccId=" 
+                    + $("#editForm #ctnNccId").val() + "&pnId=" + $("#editForm #ctnPnId").val(), { 
+                    }, function (response) {
+                        console.log("Cập nhật thành công:", response);
+                        location.reload();
+                    }).fail(function (xhr, status, error) {
+                        console.error("Có lỗi xảy ra khi cập nhật :", error);
+                    });
+                });
+
+                // Nút "Hủy"
+                $('#editForm .btnCancel').on('click', function (e) {
+                    e.preventDefault();
+
+                    // Ẩn form
+                    $('#editFormContainer').hide();
+                });
+
+
+                // DELETE METHOD =======================================================
+                $('#tbl1 tbody').on('click', '.btnDelete', function () {
+                    var data = table_direct.row($(this).parents('tr')).data();
+
+                    var ctnId = data.ctnId; // Get the product ID
+                    var ctnNccId = data.ctnNccId; // Get the product ID
+                    var ctnSpId = data.ctnSpId; // Get the product ID
+                    var ctnPnId = data.ctnPnId; // Get the product ID
+
+
+                    // Send a DELETE request to the server endpoint
+                    if (confirm("Bạn có muốn xóa Phiếu nhập CT này không?")) {
+                        $.ajax({
+                            url: 'https://localhost:7282/TblPhieunhapCt/Delete?pnctId=' + ctnId + '&nccId=' + ctnNccId + '&spId=' + ctnSpId + '&pnId=' + ctnPnId,
+                            type: 'DELETE',
+                            success: function () {
+                                table_direct.ajax.reload();
+                            },
+                            error: function (jqXHR, textStatus, errorThrown) {
+                                console.error('Lỗi xóa: ', textStatus, errorThrown);
+                            }
+                        });
+                    }
+                });
+
+
+                //EXPORT FILE ====================================================
+                $('#exportButton').on('click', function () {
+                    // Lấy dữ liệu từ bảng DataTable
+                    var data = table_direct.rows().data().toArray();
+
+                    // Tạo một đối tượng Workbook mới từ dữ liệu bảng
+                    var wb = XLSX.utils.book_new();
+                    var ws = XLSX.utils.json_to_sheet(data);
+                    XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+
+                    // Tạo một ArrayBuffer từ Workbook
+                    var wbout = XLSX.write(wb, { type: 'array' });
+
+                    // Chuyển đổi ArrayBuffer thành Blob
+                    var wbBlob = new Blob([wbout], { type: 'application/octet-stream' });
+
+                    // Tạo một URL từ Blob
+                    var url = window.URL.createObjectURL(wbBlob);
+
+                    // Tạo một thẻ <a> để tải xuống tệp Excel
+                    var a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'data.xlsx';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                });
+                // Hiển thị chi tiết lên trang hoặc xử lý tùy ý
+            }).fail(function (xhr, status, error) {
+                console.error("Lỗi khi lấy chi tiết id mã phiếu nhập: ", error);
+            });
+        }
+        else 
+        { 
+            // Nếu không có pnId thì lấy danh sách thông tin
+        var url = "https://localhost:7282/TblPhieunhapCt/Get";
+
+        //khởi tạo DataTable
+        $.get(url, {}, function (kq) {
+            var dulieu = kq.data;
+            table_direct = new DataTable('#tbl1',
+                {
+                    data: dulieu,
+                    columns: [
+                        { "data": "ctnId" },
+                        { "data": "ctnMa" },
+                        { "data": "ctnGianhap" },
+                        { "data": "ctnSoluong" },
+                        { "data": "ctnTongtien" },
+                        { "data": "ctnSpId" },
+                        { "data": "ctnNccId" },
+                        { "data": "ctnPnId" },
+                        {
+                            "data": null,
+                            "defaultContent": "<div class='button-container'><button class='btnEdit'>Sửa</button><button class='btnDelete'>Xóa</button></div>"
+                        }
+                    ]
+                }
+            );
+
+            //======================================
+
+            // Xử lý cập nhật tổng số tiền khi có thay đổi trong chi tiết phiếu nhập
+            function updateTotalAmount(pnId) {
+                // Gửi một yêu cầu Ajax đến máy chủ để tính tổng số tiền từ các chi tiết phiếu nhập
+                $.get("https://localhost:7282/TblPhieunhapCt/GetTotalAmount?pnId=" + pnId, function (response) {
+                    var totalAmount = response.totalAmount;
+
+                    // Gửi một yêu cầu Ajax để cập nhật tổng số tiền trên phiếu nhập
+                    $.post("https://localhost:7282/TblPhieunhap/UpdateTotalAmount?pnId=" + pnId + "&totalAmount=" + totalAmount, function (response) {
+                        console.log("Tổng số tiền đã được cập nhật thành công cho phiếu nhập có ID:", pnId);
+                    }).fail(function (xhr, status, error) {
+                        console.error("Có lỗi xảy ra khi cập nhật tổng số tiền:", error);
+                    });
+                }).fail(function (xhr, status, error) {
+                    console.error("Có lỗi xảy ra khi lấy tổng số tiền từ các chi tiết phiếu nhập:", error);
+                });
+            }
+
+            // Xử lý sự kiện khi có thay đổi trong chi tiết phiếu nhập
+            $('#tbl1 tbody').on('change', '.chitiet-input', function () {
+                var pnId = $(this).data('pnid');
+                updateTotalAmount(pnId);
+            });
+
+            // CREATE METHOD =============================================
+            $('#btnAdd').on('click', function () {
+                // Clear the form fields
+                $('#addForm input[type="text"]').val('');
+
+
+                // Show the form
+                $('#addFormContainer').show();
+            });
+
+            // Handle form submission
+            $('#addForm').on('submit', function (e) {
+                e.preventDefault();
+
+                // Get the created data from the form
+                var createData = {
+                    ctnId: $('#addForm #ctnId').val(),
+                    ctnMa: $('#addForm #ctnMa').val(),
+                    ctnGianhap: $('#addForm #ctnGianhap').val(),
+                    ctnSoluong: $('#addForm #ctnSoluong').val(),
+                    ctnTongtien: $('#addForm #ctnTongtien').val(),
+                    ctnSpId: $('#addForm #ctnSpId').val(),
+                    ctnNccId: $('#addForm #ctnNccId').val(),
+                    ctnPnId: $('#addForm #ctnPnId').val(),
+
+                };
+
+                console.log("Mảng nhận được là:", createData);
+
+                // Send a request to the server to create the data
+                var url = "https://localhost:7282/TblPhieunhapCt/Insert";
+                $.post(url + "?ma=" + $("#ctnMa").val() + "&gianhap=" + $("#ctnGianhap").val() + "&soluong=" 
+                + $("#ctnSoluong").val() + "&tongtien=" + $("#ctnTongtien").val() + "&spId=" + $("#ctnSpId").val() 
+                + "&nccId=" + $("#ctnNccId").val() + "&pnId=" + $("#ctnPnId").val(), { 
+                }, function (response) {
+                    console.log("Thêm mới thành công:", response);
+                    location.reload();
+                }).fail(function (xhr, status, error) {
+                    console.error("Có lỗi xảy ra: ", error);
+                });
+            });
+
+            // "Cancel" button
+            $('#addForm .btnCancel').on('click', function (e) {
+                e.preventDefault();
+
+                // Hide the form
+                $('#addForm').hide();
+            });
+
+            // "Cancel" button for edit form
+            $('#editForm .btnCancel').on('click', function (e) {
+                e.preventDefault();
+
+                // Hide the form
+                $('#editFormContainer').hide();
+            });
+
+
+            // EDIT METHOD ===================================================
+            $('#tbl1 tbody').on('click', '.btnEdit', function () {
+                var data = table_direct.row($(this).parents('tr')).data();
+
+                // Điền dữ liệu vào form chỉnh sửa
+                $('#editForm #ctnId').val(data.ctnId);
+                $('#editForm #ctnMa').val(data.ctnMa);
+                $('#editForm #ctnGianhap').val(data.ctnGianhap);
+                $('#editForm #ctnSoluong').val(data.ctnSoluong);
+                $('#editForm #ctnTongtien').val(data.ctnTongtien);
+                $('#editForm #ctnSpId').val(data.ctnSpId);
+                $('#editForm #ctnNccId').val(data.ctnNccId);
+                $('#editForm #ctnPnId').val(data.ctnPnId);
+
+                // Hiển thị form
+                $('#editFormContainer').show();
+            });
+
+            // Xử lý khi submit form chỉnh sửa
+            $('#editForm').on('submit', function (e) {
+                e.preventDefault();
+
+                // Lấy dữ liệu đã cập nhật từ form
+                var updatedData = {
+                    ctnId: $('#editForm #ctnId').val(),
+                    ctnMa: $('#editForm #ctnMa').val(),
+                    ctnGianhap: $('#editForm #ctnGianhap').val(),
+                    ctnSoluong: $('#editForm #ctnSoluong').val(),
+                    ctnTongtien: $('#editForm #ctnTongtien').val(),
+                    ctnSpId: $('#editForm #ctnSpId').val(),
+                    ctnNccId: $('#editForm #ctnNccId').val(),
+                    ctnPnId: $('#editForm #ctnPnId').val(),
+
+                };
+
+                console.log("Chuỗi lấy được là:", updatedData);
+
+                var url = "https://localhost:7282/TblPhieunhapCt/Update";
+                $.post(url + "?pnctId=" + $("#editForm #ctnId").val() + "&ma=" + $("#editForm #ctnMa").val() + "&gianhap=" 
+                + $("#editForm #ctnGianhap").val() + "&soluong=" + $("#editForm #ctnSoluong").val() + "&tongtien=" 
+                + $("#editForm #ctnTongtien").val() + "&spId=" + $("#editForm #ctnSpId").val() + "&nccId=" 
+                + $("#editForm #ctnNccId").val() + "&pnId=" + $("#editForm #ctnPnId").val(), { 
+                }, function (response) {
+                    console.log("Cập nhật thành công:", response);
+                    location.reload();
+                }).fail(function (xhr, status, error) {
+                    console.error("Có lỗi xảy ra khi cập nhật :", error);
+                });
+            });
+
+            // Nút "Hủy"
+            $('#editForm .btnCancel').on('click', function (e) {
+                e.preventDefault();
+
+                // Ẩn form
+                $('#editFormContainer').hide();
+            });
+
+
+            // DELETE METHOD =======================================================
+            $('#tbl1 tbody').on('click', '.btnDelete', function () {
+                var data = table_direct.row($(this).parents('tr')).data();
+
+                var ctnId = data.ctnId; // Get the product ID
+                var ctnNccId = data.ctnNccId; // Get the product ID
+                var ctnSpId = data.ctnSpId; // Get the product ID
+                var ctnPnId = data.ctnPnId; // Get the product ID
+
+
+                // Send a DELETE request to the server endpoint
+                if (confirm("Bạn có muốn xóa Phiếu nhập CT này không?")) {
+                    $.ajax({
+                        url: 'https://localhost:7282/TblPhieunhapCt/Delete?pnctId=' + ctnId + '&nccId=' + ctnNccId + '&spId=' + ctnSpId + '&pnId=' + ctnPnId,
+                        type: 'DELETE',
+                        success: function () {
+                            table_direct.ajax.reload();
+                        },
+                        error: function (jqXHR, textStatus, errorThrown) {
+                            console.error('Lỗi xóa: ', textStatus, errorThrown);
+                        }
+                    });
+                }
+            });
+
+
+            //EXPORT FILE
+            $('#exportButton').on('click', function () {
+                // Lấy dữ liệu từ bảng DataTable
+                var data = table_direct.rows().data().toArray();
+
+                // Tạo một đối tượng Workbook mới từ dữ liệu bảng
+                var wb = XLSX.utils.book_new();
+                var ws = XLSX.utils.json_to_sheet(data);
+                XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+
+                // Tạo một ArrayBuffer từ Workbook
+                var wbout = XLSX.write(wb, { type: 'array' });
+
+                // Chuyển đổi ArrayBuffer thành Blob
+                var wbBlob = new Blob([wbout], { type: 'application/octet-stream' });
+
+                // Tạo một URL từ Blob
+                var url = window.URL.createObjectURL(wbBlob);
+
+                // Tạo một thẻ <a> để tải xuống tệp Excel
+                var a = document.createElement('a');
+                a.href = url;
+                a.download = 'data.xlsx';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            });
+        });
+    };
+    });
+</script>

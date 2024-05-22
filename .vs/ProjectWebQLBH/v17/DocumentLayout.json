@@ -1,0 +1,88 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "D:\\BE\\ProjectWebQLBH\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{22BFD9BA-8A51-4B42-884C-9043230C39A3}|H\u1EC6 TH\u1ED0NG QU\u1EA2N L\u00CD B\u00C1N H\u00C0NG\\FE.csproj|d:\\be\\projectwebqlbh\\h\u1EC7 th\u1ED1ng qu\u1EA3n l\u00ED b\u00E1n h\u00E0ng\\views\\home\\tblphieunhapct.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{22BFD9BA-8A51-4B42-884C-9043230C39A3}|H\u1EC6 TH\u1ED0NG QU\u1EA2N L\u00CD B\u00C1N H\u00C0NG\\FE.csproj|solutionrelative:h\u1EC7 th\u1ED1ng qu\u1EA3n l\u00ED b\u00E1n h\u00E0ng\\views\\home\\tblphieunhapct.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{22BFD9BA-8A51-4B42-884C-9043230C39A3}|H\u1EC6 TH\u1ED0NG QU\u1EA2N L\u00CD B\u00C1N H\u00C0NG\\FE.csproj|d:\\be\\projectwebqlbh\\h\u1EC7 th\u1ED1ng qu\u1EA3n l\u00ED b\u00E1n h\u00E0ng\\views\\shared\\_layout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{22BFD9BA-8A51-4B42-884C-9043230C39A3}|H\u1EC6 TH\u1ED0NG QU\u1EA2N L\u00CD B\u00C1N H\u00C0NG\\FE.csproj|solutionrelative:h\u1EC7 th\u1ED1ng qu\u1EA3n l\u00ED b\u00E1n h\u00E0ng\\views\\shared\\_layout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{22BFD9BA-8A51-4B42-884C-9043230C39A3}|H\u1EC6 TH\u1ED0NG QU\u1EA2N L\u00CD B\u00C1N H\u00C0NG\\FE.csproj|d:\\be\\projectwebqlbh\\h\u1EC7 th\u1ED1ng qu\u1EA3n l\u00ED b\u00E1n h\u00E0ng\\views\\home\\tblctdonhang.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{22BFD9BA-8A51-4B42-884C-9043230C39A3}|H\u1EC6 TH\u1ED0NG QU\u1EA2N L\u00CD B\u00C1N H\u00C0NG\\FE.csproj|solutionrelative:h\u1EC7 th\u1ED1ng qu\u1EA3n l\u00ED b\u00E1n h\u00E0ng\\views\\home\\tblctdonhang.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{22BFD9BA-8A51-4B42-884C-9043230C39A3}|H\u1EC6 TH\u1ED0NG QU\u1EA2N L\u00CD B\u00C1N H\u00C0NG\\FE.csproj|d:\\be\\projectwebqlbh\\h\u1EC7 th\u1ED1ng qu\u1EA3n l\u00ED b\u00E1n h\u00E0ng\\views\\home\\tbldonhang.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{22BFD9BA-8A51-4B42-884C-9043230C39A3}|H\u1EC6 TH\u1ED0NG QU\u1EA2N L\u00CD B\u00C1N H\u00C0NG\\FE.csproj|solutionrelative:h\u1EC7 th\u1ED1ng qu\u1EA3n l\u00ED b\u00E1n h\u00E0ng\\views\\home\\tbldonhang.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 118,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "TblPhieunhapCt.cshtml",
+              "DocumentMoniker": "D:\\BE\\ProjectWebQLBH\\H\u1EC6 TH\u1ED0NG QU\u1EA2N L\u00CD B\u00C1N H\u00C0NG\\Views\\Home\\TblPhieunhapCt.cshtml",
+              "RelativeDocumentMoniker": "H\u1EC6 TH\u1ED0NG QU\u1EA2N L\u00CD B\u00C1N H\u00C0NG\\Views\\Home\\TblPhieunhapCt.cshtml",
+              "ToolTip": "D:\\BE\\ProjectWebQLBH\\H\u1EC6 TH\u1ED0NG QU\u1EA2N L\u00CD B\u00C1N H\u00C0NG\\Views\\Home\\TblPhieunhapCt.cshtml",
+              "RelativeToolTip": "H\u1EC6 TH\u1ED0NG QU\u1EA2N L\u00CD B\u00C1N H\u00C0NG\\Views\\Home\\TblPhieunhapCt.cshtml",
+              "ViewState": "AQIAALcAAAAAAAAAAAAAAOIAAAASAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2024-05-21T03:51:18.681Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "TblDonhang.cshtml",
+              "DocumentMoniker": "D:\\BE\\ProjectWebQLBH\\H\u1EC6 TH\u1ED0NG QU\u1EA2N L\u00CD B\u00C1N H\u00C0NG\\Views\\Home\\TblDonhang.cshtml",
+              "RelativeDocumentMoniker": "H\u1EC6 TH\u1ED0NG QU\u1EA2N L\u00CD B\u00C1N H\u00C0NG\\Views\\Home\\TblDonhang.cshtml",
+              "ToolTip": "D:\\BE\\ProjectWebQLBH\\H\u1EC6 TH\u1ED0NG QU\u1EA2N L\u00CD B\u00C1N H\u00C0NG\\Views\\Home\\TblDonhang.cshtml",
+              "RelativeToolTip": "H\u1EC6 TH\u1ED0NG QU\u1EA2N L\u00CD B\u00C1N H\u00C0NG\\Views\\Home\\TblDonhang.cshtml",
+              "ViewState": "AQIAAMkAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2024-05-21T02:40:54.73Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "_Layout.cshtml",
+              "DocumentMoniker": "D:\\BE\\ProjectWebQLBH\\H\u1EC6 TH\u1ED0NG QU\u1EA2N L\u00CD B\u00C1N H\u00C0NG\\Views\\Shared\\_Layout.cshtml",
+              "RelativeDocumentMoniker": "H\u1EC6 TH\u1ED0NG QU\u1EA2N L\u00CD B\u00C1N H\u00C0NG\\Views\\Shared\\_Layout.cshtml",
+              "ToolTip": "D:\\BE\\ProjectWebQLBH\\H\u1EC6 TH\u1ED0NG QU\u1EA2N L\u00CD B\u00C1N H\u00C0NG\\Views\\Shared\\_Layout.cshtml",
+              "RelativeToolTip": "H\u1EC6 TH\u1ED0NG QU\u1EA2N L\u00CD B\u00C1N H\u00C0NG\\Views\\Shared\\_Layout.cshtml",
+              "ViewState": "AQIAAGIAAAAAAAAAAAAAAGYAAAA9AAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2024-05-21T02:38:32.175Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "TblCtdonhang.cshtml",
+              "DocumentMoniker": "D:\\BE\\ProjectWebQLBH\\H\u1EC6 TH\u1ED0NG QU\u1EA2N L\u00CD B\u00C1N H\u00C0NG\\Views\\Home\\TblCtdonhang.cshtml",
+              "RelativeDocumentMoniker": "H\u1EC6 TH\u1ED0NG QU\u1EA2N L\u00CD B\u00C1N H\u00C0NG\\Views\\Home\\TblCtdonhang.cshtml",
+              "ToolTip": "D:\\BE\\ProjectWebQLBH\\H\u1EC6 TH\u1ED0NG QU\u1EA2N L\u00CD B\u00C1N H\u00C0NG\\Views\\Home\\TblCtdonhang.cshtml",
+              "RelativeToolTip": "H\u1EC6 TH\u1ED0NG QU\u1EA2N L\u00CD B\u00C1N H\u00C0NG\\Views\\Home\\TblCtdonhang.cshtml",
+              "ViewState": "AQIAAMYAAAAAAAAAAAAAAKUAAAAFAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2024-05-21T02:01:33.789Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

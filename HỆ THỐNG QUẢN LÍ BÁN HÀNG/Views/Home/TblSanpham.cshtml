@@ -1,0 +1,465 @@
+﻿@{
+}
+@{
+    ViewData["Title"] = "DANH SÁCH SẢN PHẨM";
+}
+
+<h1 style="color:rgb(42, 44, 44);">@ViewData["Title"]</h1>
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="//cdn.datatables.net/2.0.5/js/dataTables.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/shim.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<link rel="stylesheet" href="//cdn.datatables.net/2.0.5/css/dataTables.dataTables.min.css" />
+
+<style>
+
+    .button-container {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .btnEdit, .btnDelete {
+        color: #fff;
+        border: none;
+        padding: 5px 10px;
+        cursor: pointer;
+        margin-right: 5px;
+        border-radius: 5px;
+        transition: opacity 0.3s ease;
+    }
+
+    .btnEdit {
+        background-color: #007bff;
+    }
+
+    .btnDelete {
+        background-color: #dc3545;
+    }
+
+    .btnEdit:hover, .btnDelete:hover {
+        opacity: 0.7;
+    }
+
+    #editForm h2 {
+        text-align: center;
+        margin: 20px 0;
+    }
+
+    .btnSave, .btnCancel, .btnCreate {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+        cursor: pointer;
+        margin: 10px;
+    }
+
+    .btnSave, .btnCreate {
+        background-color: #0b63e6;
+        color: white;
+    }
+
+    .btnCancel {
+        background-color: #f44336;
+        color: white;
+    }
+
+    .btnSave:hover, .btnCancel:hover {
+        opacity: 0.8;
+    }
+
+    input {
+        width: 100%;
+        margin-bottom: 20px;
+    }
+
+    .button-containers {
+        display: flex;
+    }
+
+    #editFormContainer {
+        background-color: rgba(0, 0, 0, 0.5); /* Đặt màu nền mờ */
+    }
+
+    #editForm {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: max-content;
+        padding: 20px;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        z-index: 1001;
+        background-color: aquamarine;
+    }
+
+    #addFormContainer {
+        display: none;
+        z-index: 10000; /* Đặt z-index lớn hơn để hiển thị trên các phần khác của trang */
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        width: max-content;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        background-color: #cccdcf;
+        position: fixed; /* Đặt vị trí cố định trên trang */
+    }
+
+    #editFormContainer {
+        display: none;
+        z-index: 10000; /* Đặt z-index lớn hơn để hiển thị trên các phần khác của trang */
+        left: 50%;
+        top: 39%;
+        transform: translate(-50%, -50%);
+        width: max-content;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        background-color: #cccdcf;
+        position: fixed; /* Đặt vị trí cố định trên trang */
+    }
+
+    #addFormContainer {
+        background-color: rgba(0, 0, 0, 0.5); /* Đặt màu nền mờ */
+    }
+
+    #addForm {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: max-content;
+        padding: 20px;
+        border: px solid #ccc;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        z-index: 1001;
+        background-color: aquamarine;
+    }
+
+    #btnAdd {
+        background-color: #0b63e6;
+        padding: 10px;
+        font-weight: 600;
+        border-radius: 5px;
+        color: #f7f9fc
+    }
+
+    .button-container button:hover {
+        background-color: #008CBA !important; /* Change background color on hover */
+        cursor: pointer !important; /* Change cursor to a pointer on hover */
+    }
+</style>
+
+<div class="button-container">
+    <button type="submit" id="btnAdd" style="background-color: #4CAF50; color: white; padding: 10px 20px; border: none; border-radius: 5px;">Thêm Sản Phẩm</button>
+    <button id="exportButton" style="background-color: orangered; color: white; padding: 10px 20px; border: none; border-radius: 5px;">Xuất File Excel</button>
+
+</div>
+
+<div id="addFormContainer" style="display: none;">
+    <form id="addForm">
+        <div><input type="hidden" id="spId" name="spId" /></div>
+        <div><input type="text" id="spMa" name="spMa" placeholder="Mã SP" required></div>
+        <div><input type="number" id="spGiaban" name="spGiaban" placeholder="Giá bán" required></div>
+        <div><input type="text" id="spTenSp" name="spTenSp" placeholder="Tên SP " required></div>
+        <div><input type="text" id="spMota" name="spMota" placeholder="Mô tả" required></div>
+        <div><input type="text" id="spCcId" name="spCcId" placeholder="Id nhà cung cấp" required></div>
+        <div><input type="text" id="spDonvi" name="spDonvi" placeholder="Đơn vị" required></div>
+        <div><input type="date" id="spNsx" name="spNsx" placeholder="Ngày sản xuất" required></div>
+        <div><input type="date" id="spHsd" name="spHsd" placeholder="Hạn sử dụng" required></div>
+        <div class="button-containers">
+            <button type="submit" class="btnCancel">Hủy</button>
+            <button type="submit" class="btnCreate">Thêm</button>
+        </div>
+    </form>
+</div>
+
+<table id="tbl1">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>ID Nhà cung cấp</th>
+            <th>Mã</th>
+            <th>Tên SP </th>
+            <th>Mô tả </th>
+            <th>Đơn vị </th>
+            <th>Giá bán</th>
+            <th>Ngày sản xuất</th>
+            <th>Hạn sử dụng</th>
+        </tr>
+    </thead>
+</table>
+
+<div id="editFormContainer" style="display:none" ;>
+    <form id="editForm">
+        <h2> Edit Form</h2>
+        <input type="hidden" id="spId" name="spId" />
+
+        <div>
+            <label for="spCcId"> Id nhà cung cấp :</label>
+            <input type="text" id="spCcId" name="spCcId" placeholder="Id nhà cung cấp" required />
+        </div>
+        <div>
+            <label for="spMa"> Mã:</label>
+            <input type="text" id="spMa" name="spMa" placeholder="Mã" required />
+        </div>
+
+        <div>
+            <label for="spGiaban"> Giá bán :</label>
+            <input type="number" id="spGiaban" name="spGiaban" placeholder="Giá bán " required />
+        </div>
+        <div>
+            <label for="spTenSp"> Tên:</label>
+            <input type="text" id="spTenSp" name="spTenSp" placeholder="Tên" required />
+        </div>
+        <div>
+            <label for="spMota"> Mô tả :</label>
+            <input type="text" id="spMota" name="spMota" placeholder="Mô tả " required />
+        </div>
+
+        <div>
+            <label for="spDonvi"> Đơn vị :</label>
+            <input type="text" id="spDonvi" name="spDonvi" placeholder="Đơn vị" required />
+        </div>
+        <div>
+            <label for="spNsx"> Ngày sản xuất:</label>
+            <input type="date" id="spNsx" name="spNsx" placeholder="Ngày sản xuất" required />
+        </div>
+        <div>
+            <label for="spHsd"> Hạn sử dụng:</label>
+            <input type="date" id="spHsd" name="spHsd" placeholder="Hạn sử dụng" required />
+        </div>
+
+        <div class="button-containers">
+            <button type="submit" class="btnSave">Lưu</button>
+            <button type="submit" class="btnCancel">Hủy</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    //get information
+    $(document).ready(function () {
+        var url = "https://localhost:7282/TblSanpham/Get";
+        //khởi tạo DataTable
+        $.get(url, {}, function (kq) {
+            var dulieu = kq.data;
+            table_direct = new DataTable('#tbl1',
+                {
+                    data: dulieu,
+                    columns: [
+                        { "data": "spId" },
+                        { "data": "spCcId" },
+                        { "data": "spMa" },
+                        { "data": "spTenSp" },
+                        { "data": "spMota" },
+                        { "data": "spDonvi" },
+                        { "data": "spGiaban" },
+                        { "data": "spNsx" },
+                        { "data": "spHsd" },
+                        {
+                            "data": null,
+                            "defaultContent": "<div class='button-container'><button class='btnEdit'>Sửa</button><button class='btnDelete'>Xóa</button></div>"
+                        }
+                    ]
+                }
+            );
+
+            // CREATE METHOD =============================================
+            $('#btnAdd').on('click', function () {
+                // Clear the form fields
+                $('#addForm input[type="text"]').val('');
+
+
+                // Show the form
+                $('#addFormContainer').show();
+            });
+
+            // Handle form submission
+            $('#addForm').on('submit', function (e) {
+                e.preventDefault();
+
+                // Get the created data from the form
+                var createData = {
+                    spId: $('#addForm #spId').val(),
+                    spMa: $('#addForm #spMa').val(),
+                    spGiaban: $('#addForm #spGiaban').val(),
+                    spTenSp: $('#addForm #spTenSp').val(),
+                    spMota: $('#addForm #spMota').val(),
+                    spCcId: $('#addForm #spCcId').val(),
+                    spDonvi: $('#addForm #spDonvi').val(),
+                    spNsx: $('#addForm #spNsx').val(),
+                    spHsd: $('#addForm #spHsd').val(),
+                    spGiaban: $('#addForm #spGiaban').val(),
+
+                };
+
+                console.log("Mảng nhận được là:", createData);
+
+                // Send a request to the server to create the data
+                var url = "https://localhost:7282/TblSanpham/Insert";
+                $.post(url + "?ma=" + $("#spMa").val() + "&ten=" + $("#spTenSp").val() + "&mota=" + $("#spMota").val() 
+                + "&donvi=" + $("#spDonvi").val() + "&giaban=" + $("#spGiaban").val() + "&nsx=" + $("#spNsx").val() + "&hsd=" 
+                + $("#spHsd").val() + "&ccID=" + $("#spCcId").val(), { 
+                }, function (response) {
+                    console.log("Thêm mới thành công:", response);
+                    location.reload();
+                }).fail(function (xhr, status, error) {
+                    console.error("Có lỗi xảy ra: ", error);
+                });
+            });
+
+            // "Cancel" button
+            $('#addForm .btnCancel').on('click', function (e) {
+                e.preventDefault();
+
+                // Hide the form
+                $('#addForm').hide();
+            });
+
+            // "Cancel" button for edit form
+            $('#editForm .btnCancel').on('click', function (e) {
+                e.preventDefault();
+
+                // Hide the form
+                $('#editFormContainer').hide();
+            });
+
+
+
+
+            // EDIT METHOD ===================================================
+            $('#tbl1 tbody').on('click', '.btnEdit', function () {
+                var data = table_direct.row($(this).parents('tr')).data();
+
+                // Điền dữ liệu vào form chỉnh sửa
+
+                $('#editForm #spId').val(data.spId);
+                $('#editForm #spCcId').val(data.spCcId);
+                $('#editForm #spMa').val(data.spMa);
+                $('#editForm #spTenSp').val(data.spTenSp);
+                $('#editForm #spGiaban').val(data.spGiaban);
+                $('#editForm #spMota').val(data.spMota);
+                $('#editForm #spDonvi').val(data.spDonvi);
+                $('#editForm #spNsx').val(data.spNsx);
+                $('#editForm #spHsd').val(data.spHsd);
+
+
+                // Hiển thị form
+                $('#editFormContainer').show();
+            });
+
+            // Xử lý khi submit form chỉnh sửa
+            $('#editForm').on('submit', function (e) {
+                e.preventDefault();
+
+                // Lấy dữ liệu đã cập nhật từ form
+                var updatedData = {
+                    spId: $('#editForm #spId').val(),
+                    spCcId: $('#editForm #spCcId').val(),
+                    spMa: $('#editForm #spMa').val(),
+                    spTenSp: $('#editForm #spTenSp').val(),
+                    spMota: $('#editForm #spMota').val(),
+                    spDonvi: $('#editForm #spDonvi').val(),
+                    spNsx: $('#editForm #spNsx').val(),
+                    spHsd: $('#editForm #spHsd').val(),
+                    spGiaban: $('#editForm #spGiaban').val(),
+
+                };
+
+                console.log("Chuỗi lấy được là:", updatedData);
+
+                var url = "https://localhost:7282/TblSanpham/Update";
+                $.post(url + "?spId=" + $("#editForm #spId").val() + "&ccId=" + $("#editForm #spCcId").val() 
+                + "&ma=" + $("#editForm #spMa").val() + "&ten=" + $("#editForm #spTenSp").val() + "&mota=" 
+                + $("#editForm #spMota").val() + "&donvi=" + $("#editForm #spDonvi").val() + "&giaban=" 
+                + $("#editForm #spGiaban").val() + "&nsx=" + $("#editForm #spNsx").val() + "&hsd=" + $("#editForm #spHsd").val(), { 
+                }, function (response) {
+                    console.log("Cập nhật thành công:", response);
+                    location.reload();
+                }).fail(function (xhr, status, error) {
+                    console.error("Có lỗi xảy ra khi cập nhật :", error);
+                });
+            });
+
+            // Nút "Hủy"
+            $('#editForm .btnCancel').on('click', function (e) {
+                e.preventDefault();
+
+                // Ẩn form
+                $('#editFormContainer').hide();
+            });
+
+
+            // DELETE METHOD =======================================================
+            $('#tbl1 tbody').on('click', '.btnDelete', function () {
+                var data = table_direct.row($(this).parents('tr')).data();
+
+                var spId = data.spId; // Get the product ID
+                var spCcId = data.spCcId;
+
+                // Send a DELETE request to the server endpoint
+                if (confirm("Bạn có muốn xóa SP này không?")) {
+                    $.ajax({
+                        url: 'https://localhost:7282/TblSanpham/Delete?spId=' + spId + '&ccId=' + spCcId,
+                        type: 'DELETE',
+                        success: function () {
+                            table_direct.ajax.reload();
+                        },
+                        error: function (jqXHR, textStatus, errorThrown) {
+                            console.error('Lỗi xóa: ', textStatus, errorThrown);
+                        }
+                    });
+                }
+            });
+
+
+            //EXPORT FILE ==============================================================
+            $('#exportButton').on('click', function () {
+                // Lấy dữ liệu từ bảng DataTable
+                var data = table_direct.rows().data().toArray();
+
+                // Tạo một đối tượng Workbook mới từ dữ liệu bảng
+                var wb = XLSX.utils.book_new();
+                var ws = XLSX.utils.json_to_sheet(data);
+                XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+
+                // Tạo một ArrayBuffer từ Workbook
+                var wbout = XLSX.write(wb, { type: 'array' });
+
+                // Chuyển đổi ArrayBuffer thành Blob
+                var wbBlob = new Blob([wbout], { type: 'application/octet-stream' });
+
+                // Tạo một URL từ Blob
+                var url = window.URL.createObjectURL(wbBlob);
+
+                // Tạo một thẻ <a> để tải xuống tệp Excel
+                var a = document.createElement('a');
+                a.href = url;
+                a.download = 'data.xlsx';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            });
+        });
+    });
+</script>
+
+

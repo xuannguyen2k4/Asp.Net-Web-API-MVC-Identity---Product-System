@@ -1,0 +1,475 @@
+﻿@{
+    ViewData["Title"] = "DANH SÁCH NHÂN VIÊN";
+}
+
+<h1 style="color:rgb(42, 44, 44);">@ViewData["Title"]</h1>
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="//cdn.datatables.net/2.0.5/js/dataTables.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/shim.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<link rel="stylesheet" href="//cdn.datatables.net/2.0.5/css/dataTables.dataTables.min.css" />
+
+<style>
+    .button-container {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .btnEdit, .btnDelete {
+        color: #fff;
+        border: none;
+        padding: 5px 10px;
+        cursor: pointer;
+        margin-right: 5px;
+        border-radius: 5px;
+        transition: opacity 0.3s ease;
+    }
+
+    .btnEdit {
+        background-color: #007bff;
+    }
+
+    .btnDelete {
+        background-color: #dc3545;
+    }
+
+    .btnEdit:hover, .btnDelete:hover {
+        opacity: 0.7;
+    }
+
+    #editForm h2 {
+        text-align: center;
+        margin: 20px 0;
+    }
+
+    .btnSave, .btnCancel, .btnCreate {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+        cursor: pointer;
+        margin: 10px;
+    }
+
+    .btnSave, .btnCreate {
+        background-color: #0b63e6;
+        color: white;
+    }
+
+    .btnCancel {
+        background-color: #f44336;
+        color: white;
+    }
+
+    .btnSave:hover, .btnCancel:hover, .btnCreate:hover {
+        opacity: 0.8;
+    }
+
+    input {
+        width: 100%;
+        margin-bottom: 20px;
+    }
+
+    .button-containers {
+        display: flex;
+    }
+
+    #editForm {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 400px;
+        padding: 20px;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        z-index: 1001;
+        background-color: aquamarine;
+    }
+
+    #addFormContainer {
+        display: none;
+        z-index: 10000; /* Đặt z-index lớn hơn để hiển thị trên các phần khác của trang */
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        width: max-content;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        background-color: #cccdcf;
+        position: fixed; /* Đặt vị trí cố định trên trang */
+    }
+
+    #editFormContainer {
+        display: none;
+        z-index: 10000; /* Đặt z-index lớn hơn để hiển thị trên các phần khác của trang */
+        left: 50%;
+        top: 60%;
+        transform: translate(-50%, -50%);
+        max-width:450px;
+        width: 90%;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        background-color: #cccdcf;
+        position: fixed; /* Đặt vị trí cố định trên trang */
+        max-height: 90%; /* Giới hạn chiều cao để tạo ra khung cuộn */
+        overflow-y: auto; /* Tạo khung cuộn dọc */
+        padding: 200px; /* Đảm bảo có khoảng cách trong form */
+    }
+
+
+    #addFormContainer {
+        background-color: rgba(0, 0, 0, 0.5); /* Đặt màu nền mờ */
+    }
+
+    #addForm {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 500px;
+        padding: 20px;
+        border: px solid #ccc;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        z-index: 1001;
+        background-color: aquamarine;
+    }
+
+    #btnAdd {
+        background-color: #0b63e6;
+        padding: 10px;
+        font-weight: 600;
+        border-radius: 5px;
+        color: #f7f9fc
+    }
+</style>
+
+<div class="button-container">
+    <button type="submit" id="btnAdd" style="background-color: #4CAF50; color: white; padding: 10px 20px; border: none; border-radius: 5px;">Thêm Nhân Viên</button>
+    <button id="exportButton" style="background-color: orangered; color: white; padding: 10px 20px; border: none; border-radius: 5px;">Xuất File Excel</button>
+</div>
+
+<div id="addFormContainer" style="display: none;">
+    <form id="addForm">
+        <div><input type="hidden" id="nvId" name="nvId" /></div>
+        <div><input type="text" id="nvMa" name="nvMa" placeholder="Mã Nhân viên" required></div>
+        <div><input type="text" id="nvTen" name="nvTen" placeholder="Tên NV" required></div>
+        <div><input type="text" id="nvDiachi" name="nvDiachi" placeholder="Địa chỉ NV" required></div>
+        <div><input type="email" id="nvEmail" name="nvEmail" placeholder="Email" required></div>
+        <div><input type="number" id="nvSđt" name="nvSđt" placeholder="SĐT" maxlength="10" required></div>
+        <div>
+            <label for="nvNgaysinh"> Ngày sinh :</label>
+            <input type="date" id="nvNgaysinh" name="nvNgaysinh" placeholder="Ngày Sinh" required>
+        </div>
+        <div>
+            <label for="nvNgaythamgia"> Ngày tham gia:</label>
+            <input type="date" id="nvNgaythamgia" name="nvNgaythamgia" placeholder="Ngày tham gia" required>
+        </div>
+        <div><input type="text" id="nvMatkhau" name="nvMatkhau" placeholder="Mật Khẩu" required></div>
+        <div>
+            <label for="nvGioitinh">Giới tính</label>
+            <select id="nvGioitinh" name="nvGioitinh" required>
+                <option value="Nam">Nam</option>
+                <option value="Nữ">Nữ</option>
+                <option value="Khác">Khác</option>
+            </select>
+        </div>
+        <div class="button-containers">
+            <button type="submit" class="btnCancel">Hủy</button>
+            <button type="submit" class="btnCreate">Thêm</button>
+        </div>
+    </form>
+</div>
+
+
+<table id="tbl1">
+    <thead>
+        <tr>
+            <th>ID NV</th>
+            <th>Mã NV</th>
+            <th>Tên </th>
+            <th>Địa chỉ </th>
+            <th>Email </th>
+            <th>SĐT</th>
+            <th>Ngày sinh</th>
+            <th>Ngày tham gia</th>
+            <th>Mật khẩu</th>
+            <th>Giới tính</th>
+        </tr>
+    </thead>
+</table>
+
+<div id="editFormContainer" style="display:none;">
+    <form id="editForm">
+        <h2> Edit Form</h2>
+        <input type="hidden" id="nvId" name="nvId"/>
+        <div>
+            <label for="nvMa"> Mã:</label>
+            <input type="text" id="nvMa" name="nvMa" placeholder="Mã nhân viên" required />
+        </div>
+        <div>
+            <input type="text" id="nvTen" name="nvTen" placeholder="Tên " required />
+        </div>
+        <div>
+            <label for="nvSđt"> Số điện thoại:</label>
+            <input type="number" id="nvSđt" name="nvSđt" placeholder="Số điện thoại" maxlength="10" required />
+        </div>
+        <div>
+            <input type="text" id="nvDiachi" name="nvDiachi" placeholder="địa chỉ " required />
+        </div>
+        <div>
+            <input type="email" id="nvEmail" name="nvEmail" placeholder="Email" required />
+        </div>
+        <div>
+            <label for="nvNgaysinh"> Ngày sinh :</label>
+            <input type="text" id="nvNgaysinh" name="nvNgaysinh" placeholder="Ngay sinh" required />
+        </div>
+        <div>
+            <label for="nvNgaythamgia"> Ngày tham gia:</label>
+            <input type="text" id="nvNgaythamgia" name="nvNgaythamgia" placeholder="Ngaythamgia" required />
+        </div>
+        <div>
+            <label for="nvMatkhau"> Matkhau :</label>
+            <input type="text" id="nvMatkhau" name="nvMatkhau" placeholder="Matkhau" required />
+        </div>
+        <div>
+            <label for="nvGioitinh">Giới tính:</label>
+            <select id="nvGioitinh" name="nvGioitinh" required>
+                <option value="Nam">Nam</option>
+                <option value="Nữ">Nữ</option>
+                <option value="Khác">Khác</option>
+            </select>
+        </div>
+        <div class="button-containers">
+            <button type="submit" class="btnSave">Lưu</button>
+            <button type="submit" class="btnCancel">Hủy</button>
+        </div>
+    </form>
+</div>
+
+
+<script>
+    //get information
+    $(document).ready(function () {
+        var url = "https://localhost:7282/TblNhanvien/Get";
+
+        //khởi tạo DataTable
+        $.get(url, {}, function (kq) {
+            var dulieu = kq.data;
+            table_direct = new DataTable('#tbl1',
+                {
+                    data: dulieu,
+                    columns: [
+                        { "data": "nvId" },
+                        { "data": "nvMa" },
+                        { "data": "nvTen" },
+                        { "data": "nvDiachi" },
+                        { "data": "nvEmail" },
+                        { "data": "nvSđt" },
+                        { "data": "nvNgaysinh" },
+                        { "data": "nvNgaythamgia" },
+                        { "data": "nvMatkhau" },
+                        { "data": "nvGioitinh" },
+                        {
+                            "data": null,
+                            "defaultContent": "<div class='button-container'><button class='btnEdit'>Sửa</button><button class='btnDelete'>Xóa</button></div>"
+                        }
+                    ]
+                }
+            );
+
+
+            // Create Method =============================================
+            $('#btnAdd').on('click', function () {
+                // Clear the form fields
+                $('#addForm input[type="text"]').val('');
+
+
+                // Show the form
+                $('#addFormContainer').show();
+            });
+
+            // Handle form submission
+            $('#addForm').on('submit', function (e) {
+                e.preventDefault();
+
+                // Get the created data from the form
+                var createData = {
+                    nvId: $('#addForm #nvId').val(),
+                    nvMa: $('#addForm #nvMa').val(),
+                    nvTen: $('#addForm #nvTen').val(),
+                    nvsdt: $('#addForm #nvSđt').val(),
+                    nvDiachi: $('#addForm #nvDiachi').val(),
+                    nvNgaysinh: $('#addForm #nvNgaysinh').val(),
+                    nvEmail: $('#addForm #nvEmail').val(),
+                    nvGioitinh: $('#addForm #nvGioitinh').val(),
+                    nvMatkhau: $('#addForm #nvMatkhau').val(),
+                    nvNgaythamgia: $('#addForm #nvNgaythamgia').val(),
+
+                };
+
+                console.log("Mảng nhận được là:", createData);
+
+                // Send a request to the server to create the data
+                var url = "https://localhost:7282/TblNhanvien/Insert";
+                $.post(url + "?ma=" + $("#nvMa").val() + "&ten=" + $("#nvTen").val() + "&diachi=" 
+                + $("#nvDiachi").val() + "&email=" + $("#nvEmail").val() + "&sdt=" + $("#nvSđt").val() 
+                + "&ngaysinh=" + $("#nvNgaysinh").val() + "&matkhau=" + $("#nvMatkhau").val() + "&gioitinh=" + $("#nvGioitinh").val(), { 
+                }, function (response) {
+                    console.log("Thêm mới thành công:", response);
+                    location.reload();
+                }).fail(function (xhr, status, error) {
+                    console.error("Có lỗi xảy ra: ", error);
+                });
+            });
+
+            // "Cancel" button
+            $('#addForm .btnCancel').on('click', function (e) {
+                e.preventDefault();
+
+                // Hide the form
+                $('#addForm').hide();
+            });
+
+            // "Cancel" button for edit form
+            $('#editForm .btnCancel').on('click', function (e) {
+                e.preventDefault();
+
+                // Hide the form
+                $('#editFormContainer').hide();
+            });
+
+
+
+
+            // EDIT METHOD ===================================================
+            $('#tbl1 tbody').on('click', '.btnEdit', function () {
+                var data = table_direct.row($(this).parents('tr')).data();
+
+                // Điền dữ liệu vào form chỉnh sửa //
+                $('#editForm #nvId').val(data.nvId);
+                $('#editForm #nvMa').val(data.nvMa);
+                $('#editForm #nvTen').val(data.nvTen);
+                $('#editForm #nvSđt').val(data.nvSđt);
+                $('#editForm #nvDiachi').val(data.nvDiachi);
+                $('#editForm #nvNgaysinh').val(data.nvNgaysinh);
+                $('#editForm #nvEmail').val(data.nvEmail);
+                $('#editForm #nvGioitinh').val(data.nvGioitinh);
+                $('#editForm #nvMatkhau').val(data.nvMatkhau);
+                $('#editForm #nvNgaythamgia').val(data.nvNgaythamgia);
+
+                // Hiển thị form
+                $('#editFormContainer').show();
+            });
+
+            // Xử lý khi submit form chỉnh sửa
+            $('#editForm').on('submit', function (e) {
+                e.preventDefault();
+
+                // Lấy dữ liệu đã cập nhật từ form
+                var updatedData = {
+                    nvId: $('#editForm #nvId').val(),
+                    nvMa: $('#editForm #nvMa').val(),
+                    nvTen: $('#editForm #nvTen').val(),
+                    nvSđt: $('#editForm #nvSđt').val(),
+                    nvDiachi: $('#editForm #nvDiachi').val(),
+                    nvNgaysinh: $('#editForm #nvNgaysinh').val(),
+                    nvEmail: $('#editForm #nvEmail').val(),
+                    nvGioitinh: $('#editForm #nvGioitinh').val(),
+                    nvMatkhau: $('#editForm #nvMatkhau').val(),
+                    nvNgaythamgia: $('#editForm #nvNgaythamgia').val(),
+
+                };
+
+                console.log("Chuỗi lấy được là:", updatedData);
+
+                var url = "https://localhost:7282/TblNhanvien/Update";
+                $.post(url + "?nvId=" + $("#editForm #nvId").val() + "&ma=" + $("#editForm #nvMa").val() + "&ten=" 
+                + $("#editForm #nvTen").val() + "&diachi=" + $("#editForm #nvDiachi").val() + "&email=" 
+                + $("#editForm #nvEmail").val() + "&sdt=" + $("#editForm #nvSđt").val() + "&ngaysinh=" 
+                + $("#editForm #nvNgaysinh").val() + "&matkhau=" + $("#editForm #nvMatkhau").val() 
+                + "&gioitinh=" + $("#editForm #nvGioitinh").val(), { 
+                }, function (response) {
+                    console.log("Cập nhật thành công:", response);
+                    location.reload();
+                }).fail(function (xhr, status, error) {
+                    console.error("Có lỗi xảy ra khi cập nhật :", error);
+                });
+            });
+
+            // Nút "Hủy"
+            $('#editForm .btnCancel').on('click', function (e) {
+                e.preventDefault();
+
+                // Ẩn form
+                $('#editFormContainer').hide();
+            });
+
+
+            // DELETE METHOD =======================================================
+            $('#tbl1 tbody').on('click', '.btnDelete', function () {
+                var data = table_direct.row($(this).parents('tr')).data();
+
+                var nvId = data.nvId; // Get the product ID
+
+                // Send a DELETE request to the server endpoint
+                if (confirm("Bạn có muốn xóa nhân viên này không?")) {
+                    $.ajax({
+                        url: 'https://localhost:7282/TblNhanvien/Delete?nvId=' + nvId,
+                        type: 'DELETE',
+                        success: function () {
+                            table_direct.ajax.reload();
+                        },
+                        error: function (jqXHR, textStatus, errorThrown) {
+                            console.error('Lỗi xóa: ', textStatus, errorThrown);
+                        }
+                    });
+                }
+            });
+
+
+
+            //EXPORT FILE
+            $('#exportButton').on('click', function () {
+                // Lấy dữ liệu từ bảng DataTable
+                var data = table_direct.rows().data().toArray();
+
+                // Tạo một đối tượng Workbook mới từ dữ liệu bảng
+                var wb = XLSX.utils.book_new();
+                var ws = XLSX.utils.json_to_sheet(data);
+                XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+
+                // Tạo một ArrayBuffer từ Workbook
+                var wbout = XLSX.write(wb, { type: 'array' });
+
+                // Chuyển đổi ArrayBuffer thành Blob
+                var wbBlob = new Blob([wbout], { type: 'application/octet-stream' });
+
+                // Tạo một URL từ Blob
+                var url = window.URL.createObjectURL(wbBlob);
+
+                // Tạo một thẻ <a> để tải xuống tệp Excel
+                var a = document.createElement('a');
+                a.href = url;
+                a.download = 'data.xlsx';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            });
+        });
+    });
+</script>
